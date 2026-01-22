@@ -1,31 +1,57 @@
 import express from 'express';
 import path from 'path';
-import {ENV} from './lib/env.js';
+import cors from 'cors';
+import {serve} from 'inngest/express';
 
-const app=express();
+import { ENV } from './lib/env.js';
+import { connectDB } from './lib/db.js';
 
-const __dirname=path.resolve()
+const app = express();
+
+const __dirname = path.resolve();
+
+//middlewares
+
+app.use(express.json());
+app.use(cors({origin:ENV.CLIENT_URL,credentials:true}));
+
+app.use("/api/inngest", serve({
+    client:"inngest",
+    functions,
+    eventKey: ENV.INNGEST_EVENT_KEY,
+    signingKey: ENV.INNGEST_SIGNING_KEY,
+}));
+
+const PORT = ENV.PORT || 3000;
 
 
-const PORT=ENV.PORT|| 3000;
-app.listen(3000,()=>{
-    console.log(`Server is running on localhost:${PORT}`)
-})
 
-app.get("/help",(req,res)=>{
+app.get("/help", (req, res) => {
     res.json({
-        message:"Help Api Message"
+        message: "Help Api Message"
     })
 })
 
 
 // For Production
-if(ENV.NODE_ENV==="production") {
-    app.use(express.static(path.join(__dirname,"../frontend/dist")));
+if (ENV.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-    app.get("/{*any}",(req,res)=>{
-        res.sendFile(path.join(__dirname,"../frontend","dist","index.html"));
+    app.get("/{*any}", (req, res) => {
+        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
     })
 }
 
+const startServer = async () => {
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`Server is running on localhost:${PORT}`)
+        })
+    }
+    catch(error){
+        console.log("Error starting server",error);
 
+    }
+}
+startServer();
