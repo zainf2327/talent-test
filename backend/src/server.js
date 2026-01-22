@@ -5,6 +5,7 @@ import {serve} from 'inngest/express';
 
 import { ENV } from './lib/env.js';
 import { connectDB } from './lib/db.js';
+import { inngest,functions } from './lib/inngest.js';
 
 const app = express();
 
@@ -15,12 +16,10 @@ const app = express();
 app.use(express.json());
 app.use(cors({origin:ENV.CLIENT_URL,credentials:true}));
 
-// app.use("/api/inngest", serve({
-//     client:"inngest",
-//     functions,
-//     eventKey: ENV.INNGEST_EVENT_KEY,
-//     signingKey: ENV.INNGEST_SIGNING_KEY,
-// }));
+app.use("/api/inngest", serve({
+    client:inngest,
+    functions:functions,
+}));
 
 const PORT = ENV.PORT || 3000;
 
