@@ -8,19 +8,19 @@ import { connectDB } from './lib/db.js';
 
 const app = express();
 
-const __dirname = path.resolve();
+//const __dirname = path.resolve();
 
 //middlewares
 
 app.use(express.json());
 app.use(cors({origin:ENV.CLIENT_URL,credentials:true}));
 
-app.use("/api/inngest", serve({
-    client:"inngest",
-    functions,
-    eventKey: ENV.INNGEST_EVENT_KEY,
-    signingKey: ENV.INNGEST_SIGNING_KEY,
-}));
+// app.use("/api/inngest", serve({
+//     client:"inngest",
+//     functions,
+//     eventKey: ENV.INNGEST_EVENT_KEY,
+//     signingKey: ENV.INNGEST_SIGNING_KEY,
+// }));
 
 const PORT = ENV.PORT || 3000;
 
@@ -33,14 +33,14 @@ app.get("/help", (req, res) => {
 })
 
 
-// For Production
-if (ENV.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// // For Production
+// if (ENV.NODE_ENV === "production") {
+//     app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-    app.get("/{*any}", (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-    })
-}
+//     app.get("/{*any}", (req, res) => {
+//         res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+//     })
+// }
 
 const startServer = async () => {
     try {
