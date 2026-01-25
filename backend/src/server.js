@@ -2,10 +2,13 @@ import express from 'express';
 import path from 'path';
 import cors from 'cors';
 import {serve} from 'inngest/express';
+import{ clerkMiddleware } from '@clerk/express';
 
 import { ENV } from './lib/env.js';
 import { connectDB } from './lib/db.js';
 import { inngest,functions } from './lib/inngest.js';
+import { protectRoute } from './middlewares/protectRoute.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 const app = express();
 
@@ -15,11 +18,15 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({origin:ENV.CLIENT_URL,credentials:true}));
+app.use(clerkMiddleware()); // adds auth field to req object
+
+// Inngest endpoint
 
 app.use("/api/inngest", serve({
     client:inngest,
     functions:functions,
 }));
+app.use("/api/chat",chatRoutes);
 
 const PORT = ENV.PORT || 3000;
 
@@ -30,6 +37,8 @@ app.get("/help", (req, res) => {
         message: "Help Api Message"
     })
 })
+
+
 
 
 // // For Production
